@@ -1,15 +1,16 @@
 const multer = require("multer");
 const path = require("path");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../utils/cloudinary");
 
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + "-" + file.originalname;
-
-    cb(null, uniqueName);
+// Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "resumes",
+    resource_type: "raw",
+    format: async () => "pdf",
   },
 });
 
@@ -26,11 +27,9 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   storage,
-
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
+    fileSize: 5 * 1024 * 1024,
   },
-
   fileFilter,
 });
 

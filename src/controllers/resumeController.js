@@ -16,20 +16,22 @@ const logger = require("../utils/logger");
 
 exports.uploadResume = async (req, res) => {
   try {
-    const dataBuffer = fs.readFileSync(req.file.path);
+    const fileUrl = req.file.path;
 
-    const data = await pdf(dataBuffer);
+    const response = await axios.get(fileUrl, {
+      responseType: "arraybuffer",
+    });
+
+    const data = await pdf(response.data);
 
     const text = data.text;
 
-    // AI analysis
     const analysis = await analyzeResume(text);
 
     const skills = await extractSkills(text);
 
     const score = await scoreResume(text);
 
-    // save to MongoDB
     const newAnalysis = new Analysis({
       userId: req.user.id,
 
@@ -50,15 +52,14 @@ exports.uploadResume = async (req, res) => {
 
     res.json({
       message: "Resume analyzed successfully",
-
       analysis,
-
       skills,
-
       score,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      error: error.message,
+    });
   }
 };
 
@@ -121,11 +122,13 @@ exports.jobMatch = async (req, res) => {
 
     const jobDescription = req.body.jobDescription;
 
-    const filePath = req.file.path;
+    const fileUrl = req.file.path;
 
-    const dataBuffer = fs.readFileSync(filePath);
+    const response = await axios.get(fileUrl, {
+      responseType: "arraybuffer",
+    });
 
-    const data = await pdf(dataBuffer);
+    const data = await pdf(response.data);
 
     const resumeText = data.text;
 
@@ -155,13 +158,14 @@ exports.jobMatch = async (req, res) => {
 
     res.json({
       message: "Job match analysis complete",
-
       result: aiResult,
     });
   } catch (error) {
     console.log(error);
 
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      error: error.message,
+    });
   }
 };
 
