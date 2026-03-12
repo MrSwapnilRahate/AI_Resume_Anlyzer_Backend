@@ -23,6 +23,7 @@ app.use(
 app.use(express.json());
 
 // rate limiter for all API routes
+app.set("trust proxy", 1);
 app.use("/api", rateLimiter);
 
 // routes

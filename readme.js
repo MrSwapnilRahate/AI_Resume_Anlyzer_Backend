@@ -164,7 +164,7 @@ modals -> Analysis schema
         4) /api/resume/history    GET     Get user history
         5) /api/resume/:id        GET     Get resume by id
         6) /api/resume/delete/:id DELETE  Delete analysis
-        
+
         7) /api/resume/ats-score  GET     ATS score API ;
 */
 
@@ -272,4 +272,11 @@ Flow - Request -> Validation -> Controller -> AI Analysis -> MongoDB Save -> Res
  *      const app = express();
  *      app.use(cors());
  *      app.use(express.json());
+ */
+
+// ================= Day 17 - Cloudinary(Backend) ==================
+/**
+ * cloude pe resume upload krnekeliye
+ * 
+ * npm install cloudinary multer-storage-cloudinary
  */
