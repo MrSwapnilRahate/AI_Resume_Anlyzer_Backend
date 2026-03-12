@@ -1,5 +1,6 @@
 const fs = require("fs");
 const pdf = require("pdf-parse");
+const axios = require("axios");
 
 const {
   analyzeResume,
@@ -112,6 +113,12 @@ exports.deleteAnalysis = async (req, res) => {
 
 exports.jobMatch = async (req, res) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Resume file is required",
+      });
+    }
+
     const { error } = jobMatchSchema.validate(req.body);
 
     if (error) {
@@ -140,17 +147,11 @@ exports.jobMatch = async (req, res) => {
 
     const newAnalysis = new Analysis({
       userId: req.user.id,
-
       resumeName: req.file.originalname,
-
       resumeText: resumeText,
-
       jobDescription: jobDescription,
-
       matchScore: aiResult.matchScore || 0,
-
       missingSkills: aiResult.missingSkills || [],
-
       aiResult: aiResult,
     });
 
@@ -161,7 +162,7 @@ exports.jobMatch = async (req, res) => {
       result: aiResult,
     });
   } catch (error) {
-    console.log(error);
+    console.log("JOB MATCH ERROR:", error);
 
     res.status(500).json({
       error: error.message,
