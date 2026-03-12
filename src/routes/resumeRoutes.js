@@ -13,12 +13,6 @@ const {
   deleteAnalysis,
 } = require("../controllers/resumeController");
 
-const {
-  uploadResume,
-  jobMatch,
-  getHistory,
-} = require("../controllers/resumeController");
-
 // Upload Resume + AI Analysis
 router.post("/upload", authMiddleware, upload.single("resume"), uploadResume);
 
