@@ -112,60 +112,102 @@ exports.deleteAnalysis = async (req, res) => {
 };
 
 exports.jobMatch = async (req, res) => {
+
   try {
+
+    console.log("===== JOB MATCH API HIT =====");
+
+    // check file
     if (!req.file) {
+      console.log("ERROR: Resume file not received");
+
       return res.status(400).json({
+        success: false,
         message: "Resume file is required",
       });
     }
 
+    console.log("FILE RECEIVED:", req.file.originalname);
+    console.log("FILE PATH:", req.file.path);
+
+    // validate body
     const { error } = jobMatchSchema.validate(req.body);
 
     if (error) {
+      console.log("VALIDATION ERROR:", error.details[0].message);
+
       return res.status(400).json({
+        success: false,
         message: error.details[0].message,
       });
     }
 
     const jobDescription = req.body.jobDescription;
 
+    console.log("JOB DESCRIPTION LENGTH:", jobDescription.length);
+
+    // read pdf
+    console.log("READING PDF FILE...");
+
     const dataBuffer = fs.readFileSync(req.file.path);
+
+    console.log("PDF BUFFER LOADED");
 
     const data = await pdf(dataBuffer);
 
+    console.log("PDF PARSED SUCCESSFULLY");
+
     const resumeText = data.text;
+
+    console.log("RESUME TEXT LENGTH:", resumeText.length);
 
     logger.info("Job match API called");
 
+    // AI analysis
+    console.log("CALLING AI SERVICE...");
+
     const aiResult = await matchJob(resumeText, jobDescription);
 
+    console.log("AI RESULT:", aiResult);
+
     logger.info("AI analysis completed");
+
+    // save analysis
+    console.log("SAVING ANALYSIS TO DATABASE...");
 
     const newAnalysis = new Analysis({
       userId: req.user.id,
       resumeName: req.file.originalname,
       resumeText: resumeText,
       jobDescription: jobDescription,
-      matchScore: aiResult.matchScore || 0,
-      missingSkills: aiResult.missingSkills || [],
+      matchScore: aiResult?.matchScore || 0,
+      missingSkills: aiResult?.missingSkills || [],
       aiResult: aiResult,
+      createdAt: new Date(),
     });
 
     await newAnalysis.save();
 
+    console.log("ANALYSIS SAVED SUCCESSFULLY");
+
     res.json({
+      success: true,
       message: "Job match analysis complete",
       result: aiResult,
     });
+
   } catch (error) {
-    console.log("JOB MATCH ERROR:", error);
+
+    console.error("===== JOB MATCH ERROR =====");
+    console.error(error);
 
     res.status(500).json({
-      error: error.message,
+      success: false,
+      message: error.message,
     });
   }
-};
 
+};
 exports.getHistory = async (req, res) => {
   try {
     const history = await Analysis.find({ userId: req.user.id }).sort({
