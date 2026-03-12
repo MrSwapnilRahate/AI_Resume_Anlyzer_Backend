@@ -238,3 +238,38 @@ Flow - Request -> Validation -> Controller -> AI Analysis -> MongoDB Save -> Res
  * git remote add origin repo_link
  * git push -u origin main
  */
+
+// ============ Day 15 - Backen Deploy (Render) =================
+/**
+ * render.com
+ * login using GitHub
+ * New -> Web Service -> AI_Resume_Analyzer_Backend(Repo select)
+ * Configuration
+ *      Runtime - Node
+ *      Build Command - npm install
+ *      Start Command - node server.js
+ * 
+ * Environment Variables
+ *   Add Environment Variables
+ *      MONGO_URI=
+ *      JWT_SECRET=
+ *      OPENAI_API_KEY=
+ * 
+ * Create Web Service
+ * 
+ * Render automatically - clone repo, install dependencies, start server
+ * 
+ * URL milega - https://ai-resume-anlyzer-backend.onrender.com
+ * 
+ */
+
+// ============ Day 16 - CORS ======================
+/**
+ * npm install cors
+ * 
+ * app.js
+ *      import cors from "cors";
+ *      const app = express();
+ *      app.use(cors());
+ *      app.use(express.json());
+ */

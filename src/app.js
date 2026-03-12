@@ -1,10 +1,19 @@
 const express = require("express");
 const app = express();
+import cors from "cors";
 // routes import
 const authRoutes = require("./routes/authRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
 const errorMidddleware = require("./middleware/errorMiddleware");
 const rateLimit = require("./middleware/rateLimitMiddleware");
+
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        
+    ],
+    credentials: true
+}));
 
 app.use(express.json());
 
