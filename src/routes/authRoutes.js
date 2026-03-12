@@ -2,19 +2,22 @@ const express = require("express");
 
 const router = express.Router();
 
-const authController = require("../controllers/authController");
+const { signup, login } = require("../controllers/authController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 
-router.post("/signup", authController.signup);
+// Signup
+router.post("/signup", signup);
 
-router.post("/login", authController.login);
+// Login
+router.post("/login", login);
 
+// Profile (Protected Route)
 router.get("/profile", authMiddleware, (req, res) => {
-    res.json({
-        message: "Protected profile data",
-        user: req.user
-    })
-})
+  res.json({
+    message: "Protected profile data",
+    user: req.user,
+  });
+});
 
 module.exports = router;

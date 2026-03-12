@@ -1,95 +1,149 @@
 const OpenAI = require("openai");
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
+// 1️⃣ Resume Analysis
 async function analyzeResume(text) {
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
 
-    const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-            {
-                role: "system",
-                content: "You are an expert resume reviewer."
-            },
-            {
-                role: "user",
-                content: `Analyze this resume. Give skills, score out of 10, and improve suggestions:\n\n${text}`
-            }
-        ]
-    });
+    messages: [
+      {
+        role: "system",
+        content: "You are an expert resume reviewer.",
+      },
 
-    return response.choices[0].message.content;
+      {
+        role: "user",
+        content: `
+Analyze this resume and return JSON.
+
+Return format:
+
+{
+ "summary":"short resume summary",
+ "score":number,
+ "skills":[]
 }
+
+Resume:
+${text}
+`,
+      },
+    ],
+  });
+
+  return JSON.parse(response.choices[0].message.content);
+}
+
+// 2️⃣ Extract Skills
 async function extractSkills(text) {
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
 
-    const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-            {
-                role: "system",
-                content: "You are an AI that extract skills from resumes."
-            },
-            {
-                role: "user",
-                content: `Extract only technical skills from this resume. Return skills as a simple list: \n${text}`
-            }
-        ]
-    });
+    messages: [
+      {
+        role: "system",
+        content: "You extract technical skills from resumes.",
+      },
 
-    return response.choices[0].message.content;
+      {
+        role: "user",
+        content: `
+Extract only technical skills.
+
+Return JSON format:
+
+{
+ "skills":[]
 }
 
+Resume:
+${text}
+`,
+      },
+    ],
+  });
+
+  return JSON.parse(response.choices[0].message.content);
+}
+
+// 3️⃣ Resume Score
 async function scoreResume(text) {
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
 
-    const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-            {
-                role: "system",
-                content: "You are an ATS resume evaluator."
-            },
-            {
-                role: "user",
-                content: `Evaluate this resume. 
-                Give: 1. Score out of 10
-                      2. Strengths
-                      3. Improvements
+    messages: [
+      {
+        role: "system",
+        content: "You are an ATS resume evaluator.",
+      },
 
-                    Resume: ${text}`
-            }
-        ]
-    });
+      {
+        role: "user",
+        content: `
+Evaluate this resume.
 
-    return response.choices[0].message.content;
+Return JSON format:
+
+{
+ "score":number,
+ "strengths":[],
+ "improvements":[]
 }
 
+Resume:
+${text}
+`,
+      },
+    ],
+  });
+
+  return JSON.parse(response.choices[0].message.content);
+}
+
+// 4️⃣ Job Match
 async function matchJob(resumeText, jobDescription) {
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
 
-    const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-            {
-                role: "system",
-                content: "You compare resumes with job descriptions."
-            },
-            {
-                role: "user",
-                content: `Comapare this resume with the job discription.
+    messages: [
+      {
+        role: "system",
+        content: "You compare resumes with job descriptions.",
+      },
 
-                    Resume: ${resumeText}
-                    
-                    Job Description: ${jobDescription}
-                    
-                    Give: 1. Mach score in %
-                          2. Missing skills
-                          3. Suggestions to improve
-                          `
-            }
-        ]
-    });
-    return response.choices[0].message.content;
+      {
+        role: "user",
+        content: `
+Compare this resume with the job description.
+
+Return JSON format:
+
+{
+ "matchScore":number,
+ "missingSkills":[],
+ "suggestions":[]
 }
 
-module.exports = { analyzeResume, extractSkills, scoreResume, matchJob };
+Resume:
+${resumeText}
+
+Job Description:
+${jobDescription}
+`,
+      },
+    ],
+  });
+
+  return JSON.parse(response.choices[0].message.content);
+}
+
+module.exports = {
+  analyzeResume,
+  extractSkills,
+  scoreResume,
+  matchJob,
+};
