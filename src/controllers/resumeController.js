@@ -112,21 +112,16 @@ exports.deleteAnalysis = async (req, res) => {
 };
 
 exports.jobMatch = async (req, res) => {
-
   try {
-
     console.log("===== JOB MATCH API HIT =====");
-
     // check file
     if (!req.file) {
       console.log("ERROR: Resume file not received");
-
       return res.status(400).json({
         success: false,
         message: "Resume file is required",
       });
     }
-
     console.log("FILE RECEIVED:", req.file.originalname);
     console.log("FILE PATH:", req.file.path);
 
@@ -135,7 +130,6 @@ exports.jobMatch = async (req, res) => {
 
     if (error) {
       console.log("VALIDATION ERROR:", error.details[0].message);
-
       return res.status(400).json({
         success: false,
         message: error.details[0].message,
