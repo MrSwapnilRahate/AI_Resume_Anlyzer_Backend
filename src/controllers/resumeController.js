@@ -129,13 +129,9 @@ exports.jobMatch = async (req, res) => {
 
     const jobDescription = req.body.jobDescription;
 
-    const fileUrl = req.file.path;
+    const dataBuffer = fs.readFileSync(req.file.path);
 
-    const response = await axios.get(fileUrl, {
-      responseType: "arraybuffer",
-    });
-
-    const data = await pdf(response.data);
+    const data = await pdf(dataBuffer);
 
     const resumeText = data.text;
 
